@@ -14,7 +14,7 @@ export function QuestionInput({ onSearch }) {
     if (!question.trim()) return
 
     console.log("[v0] Submitting question:", { question, category: selectedCategory })
-    onSearch(question)
+    onSearch(question, selectedCategory)
   }
 
   return (

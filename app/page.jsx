@@ -8,9 +8,11 @@ import { Logo } from "@/components/logo";
 export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const handleSearch = (query) => {
+  const handleSearch = (query, category) => {
     setSearchQuery(query);
+    setSelectedCategory(category);
     setShowResults(true);
   };
 
@@ -19,7 +21,7 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Logo />
         <QuestionInput onSearch={handleSearch} />
-        {showResults && <ResultsSection searchQuery={searchQuery} />}
+        {showResults && <ResultsSection searchQuery={searchQuery} selectedCategory={selectedCategory} />}
       </div>
     </main>
   );

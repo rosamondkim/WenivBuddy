@@ -5,12 +5,12 @@ import { Code, Database, GitBranch, Layout, Server, Palette } from "lucide-react
 
 const categories = [
   { id: "all", label: "전체", icon: null },
-  { id: "fe", label: "Frontend", icon: Layout },
-  { id: "be", label: "Backend", icon: Server },
-  { id: "data", label: "Data", icon: Database },
-  { id: "git", label: "Git", icon: GitBranch },
-  { id: "design", label: "Design", icon: Palette },
-  { id: "etc", label: "기타", icon: Code },
+  { id: "Frontend", label: "Frontend", icon: Layout },
+  { id: "Backend", label: "Backend", icon: Server },
+  { id: "CSS", label: "CSS", icon: Palette },
+  { id: "JavaScript", label: "JavaScript", icon: Code },
+  { id: "Git", label: "Git", icon: GitBranch },
+  { id: "도구", label: "도구", icon: Code },
 ]
 
 export function CategoryFilters({ selected, onSelect }) {

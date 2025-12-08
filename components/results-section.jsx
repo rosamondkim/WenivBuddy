@@ -6,14 +6,14 @@ import { ReferenceCards } from "./reference-cards"
 import { FaqRecommendation } from "./faq-recommendation"
 import { AiAnswer } from "./ai-answer"
 
-export function ResultsSection({ searchQuery }) {
+export function ResultsSection({ searchQuery, selectedCategory = "all" }) {
   // TODO: Replace with actual data from API/state management
   const shouldShowFaqPrompt = true
 
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
-        <PreviousAnswers searchQuery={searchQuery} />
+        <PreviousAnswers searchQuery={searchQuery} selectedCategory={selectedCategory} />
         <div className="space-y-6">
           <SimilarQuestions />
           <ReferenceCards />
@@ -22,7 +22,7 @@ export function ResultsSection({ searchQuery }) {
 
       {shouldShowFaqPrompt && <FaqRecommendation />}
 
-      <AiAnswer searchQuery={searchQuery} />
+      <AiAnswer searchQuery={searchQuery} selectedCategory={selectedCategory} />
     </div>
   )
 }

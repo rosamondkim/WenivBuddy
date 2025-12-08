@@ -1,0 +1,27 @@
+{
+  "category": "도구",
+  "qnaList": [
+    {
+      "id": "qna-001",
+      "category": "도구",
+      "question": "VSC에서 SVG 이미지를 클릭했을 때, 강사님처럼 코드가 나오는게 아니라 전 이미지가 나와요!",
+      "keywords": ["VSC", "VSCode", "SVG", "이미지", "코드", "뷰어", "에디터"],
+      "answer": "VS Code에서 SVG 파일을 클릭했을 때 이미지로 보이는 것은 기본 설정 때문입니다.\n\nSVG 파일을 코드로 보려면:\n1. SVG 파일에서 마우스 우클릭\n2. '연결 프로그램...' 또는 'Open With...' 선택\n3. 'Text Editor' 또는 '텍스트 편집기' 선택\n\n또는 확장 프로그램을 사용할 수 있습니다:\n- 'SVG' 확장 프로그램 설치\n- 설정에서 기본 에디터를 텍스트 편집기로 변경\n\n단축키로는 SVG 파일을 선택하고 Ctrl+K, Ctrl+O (Mac: Cmd+K, Cmd+O)를 누르면 편집기 선택 옵션이 나타납니다.",
+      "author": "김코딩 강사",
+      "timestamp": "2024-12-01T10:30:00",
+      "imageUrl": "/images/vscode-svg-settings.png",
+      "views": 42
+    },
+    {
+      "id": "qna-007",
+      "category": "도구",
+      "question": "VSCode에서 Emmet 단축키가 작동하지 않아요",
+      "keywords": ["VSCode", "Emmet", "단축키", "자동완성", "HTML", "CSS", "설정"],
+      "answer": "VSCode에서 Emmet이 작동하지 않는 경우 다음을 확인해보세요.\n\n1. 파일 언어 모드 확인\n- 우측 하단의 언어 모드가 올바른지 확인 (HTML, JSX 등)\n- 잘못된 경우: 언어 모드 클릭 → 올바른 언어 선택\n\n2. settings.json 설정 추가\n{\n  \"emmet.includeLanguages\": {\n    \"javascript\": \"javascriptreact\",\n    \"typescript\": \"typescriptreact\"\n  },\n  \"emmet.triggerExpansionOnTab\": true,\n  \"emmet.showExpandedAbbreviation\": \"always\"\n}\n\n3. JSX/TSX에서 Emmet 사용\n- React 파일(.jsx, .tsx)에서는 추가 설정 필요\n- 위의 includeLanguages 설정 확인\n\n4. Tab 키 설정\n- Tab 키로 Emmet 확장: triggerExpansionOnTab: true\n\n5. 확장 프로그램 충돌\n- 다른 자동완성 확장 프로그램이 Emmet을 방해할 수 있음\n- 확장 프로그램을 하나씩 비활성화하여 테스트\n\n자주 사용하는 Emmet 약어:\n- div.container>ul>li*3\n- header+main+footer\n- ul>li.item$*5",
+      "author": "김코딩 강사",
+      "timestamp": "2024-12-03T15:00:00",
+      "imageUrl": "/images/vscode-emmet-settings.png",
+      "views": 78
+    }
+  ]
+}

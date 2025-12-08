@@ -5,20 +5,67 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Sparkles, Copy, CheckCheck, Loader2 } from "lucide-react"
 
-export function AiAnswer({ searchQuery }) {
+export function AiAnswer({ searchQuery, selectedCategory = "all" }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [answer, setAnswer] = useState(null)
   const [isCopied, setIsCopied] = useState(false)
+  const [error, setError] = useState(null)
 
   const generateAnswer = async () => {
+    if (!searchQuery) return
+
     setIsGenerating(true)
-    // TODO: Implement actual AI generation
-    setTimeout(() => {
-      setAnswer(
-        `${searchQuery}에 대한 AI 생성 답변입니다.\n\n이 답변은 여러 신뢰할 수 있는 소스와 공식 문서를 기반으로 생성되었습니다. 위의 이전 답변들에서 원하는 내용을 찾지 못한 경우 참고하실 수 있습니다.\n\n주요 포인트:\n1. 기본 개념과 사용법을 이해하는 것이 중요합니다\n2. 실제 프로젝트에 적용하면서 학습하는 것을 권장합니다\n3. 공식 문서와 최신 베스트 프랙티스를 참고하세요\n\n추가로 궁금한 점이 있다면 언제든지 질문해주세요!`,
-      )
+    setError(null)
+
+    try {
+      console.log('🤖 [AI Answer] Calling API...')
+
+      const response = await fetch('/api/generate-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: searchQuery,
+          category: selectedCategory
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `API error: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      console.log('✅ [AI Answer] Answer generated successfully')
+      setAnswer(data.answer)
+
+    } catch (err) {
+      console.error('❌ [AI Answer] Failed to generate:', err)
+      setError(err.message)
+
+      // API 키가 없는 경우
+      if (err.message.includes('API key')) {
+        setAnswer(
+          `⚠️ AI 답변 생성을 위해서는 OpenAI API 키가 필요합니다.\n\n.env.local 파일에 OPENAI_API_KEY를 설정해주세요.\n\n현재는 데이터베이스의 기존 답변만 검색할 수 있습니다.`
+        )
+      }
+      // 크레딧 부족 또는 결제 정보 필요
+      else if (err.message.includes('insufficient_quota') || err.message.includes('billing') || err.message.includes('quota')) {
+        setAnswer(
+          `💳 OpenAI API 크레딧이 부족합니다.\n\n해결 방법:\n\n1. OpenAI Platform 접속\n   👉 https://platform.openai.com/\n\n2. Settings → Billing 메뉴로 이동\n\n3. 크레딧 구매 또는 결제 정보 추가\n   - 최소 $5부터 구매 가능\n   - 신규 가입 시 $5 무료 크레딧 제공 (3개월 유효)\n\n4. 크레딧 충전 후 다시 시도\n\n💡 참고: 위의 "이전 답변" 섹션은 무료로 계속 사용 가능합니다.`
+        )
+      }
+      // 기타 에러
+      else {
+        setAnswer(
+          `죄송합니다. AI 답변 생성 중 오류가 발생했습니다.\n\n에러: ${err.message}\n\n잠시 후 다시 시도해주세요.`
+        )
+      }
+    } finally {
       setIsGenerating(false)
-    }, 2000)
+    }
   }
 
   const copyToClipboard = async () => {
