@@ -9,10 +9,12 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [uploadedImage, setUploadedImage] = useState(null);
 
-  const handleSearch = (query, category) => {
+  const handleSearch = (query, category, image) => {
     setSearchQuery(query);
     setSelectedCategory(category);
+    setUploadedImage(image);
     setShowResults(true);
   };
 
@@ -21,7 +23,13 @@ export default function Home() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Logo />
         <QuestionInput onSearch={handleSearch} />
-        {showResults && <ResultsSection searchQuery={searchQuery} selectedCategory={selectedCategory} />}
+        {showResults && (
+          <ResultsSection
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            uploadedImage={uploadedImage}
+          />
+        )}
       </div>
     </main>
   );

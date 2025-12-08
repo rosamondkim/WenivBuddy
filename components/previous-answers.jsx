@@ -8,7 +8,7 @@ import { ChevronDown, ChevronUp, ImageIcon, Copy, CheckCheck, User, Clock, Loade
 import { searchQnA, loadQnADatabase } from "@/lib/qna-search"
 import { extractKeywords } from "@/lib/keyword-extractor"
 
-export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
+export function PreviousAnswers({ searchQuery, selectedCategory = "all", uploadedImage = null, onExtractionInfoChange, onOCRTextExtracted }) {
   const [expandedId, setExpandedId] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
   const [qnaDatabase, setQnaDatabase] = useState([])
@@ -16,6 +16,8 @@ export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
   const [isLoading, setIsLoading] = useState(false)
   const [extractedKeywords, setExtractedKeywords] = useState([])
   const [extractionInfo, setExtractionInfo] = useState(null)
+  const [isProcessingOCR, setIsProcessingOCR] = useState(false)
+  const [ocrExtractedText, setOcrExtractedText] = useState(null)
 
   // Q&A 데이터베이스 로드
   useEffect(() => {
@@ -28,7 +30,7 @@ export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
 
   // 검색 실행
   useEffect(() => {
-    if (!searchQuery || !qnaDatabase.length) {
+    if ((!searchQuery && !uploadedImage) || !qnaDatabase.length) {
       setSearchResults([])
       setExtractedKeywords([])
       return
@@ -38,33 +40,84 @@ export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
 
     // 하이브리드 검색 수행
     const performSearch = async () => {
-      const searchResult = await searchQnA(qnaDatabase, searchQuery, selectedCategory, 3)
+      let finalQuery = searchQuery
+
+      // 이미지가 있으면 먼저 OCR 처리
+      if (uploadedImage) {
+        setIsProcessingOCR(true)
+
+        try {
+          console.log('🖼️ [OCR] Processing uploaded image...')
+
+          const formData = new FormData()
+          formData.append('image', uploadedImage)
+
+          const response = await fetch('/api/ocr', {
+            method: 'POST',
+            body: formData
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            console.log('✅ [OCR] Text extracted for search:', data.text.substring(0, 100) + '...')
+
+            // 추출된 텍스트를 질문에 추가
+            if (data.text) {
+              finalQuery = searchQuery
+                ? `${searchQuery}\n\n[이미지에서 추출된 텍스트]\n${data.text}`
+                : data.text
+
+              // OCR 텍스트 저장 및 부모 컴포넌트에 전달
+              setOcrExtractedText(data.text)
+              if (onOCRTextExtracted) {
+                onOCRTextExtracted(data.text)
+              }
+            }
+          } else {
+            console.error('❌ [OCR] Failed to extract text from image')
+          }
+        } catch (error) {
+          console.error('❌ [OCR] Error:', error)
+        } finally {
+          setIsProcessingOCR(false)
+        }
+      }
+
+      const searchResult = await searchQnA(qnaDatabase, finalQuery, selectedCategory, 3)
 
       // 추출 정보 저장
       if (searchResult.extractionInfo) {
         setExtractedKeywords(searchResult.extractionInfo.keywords || [])
         setExtractionInfo(searchResult.extractionInfo)
 
+        // 부모 컴포넌트에 추출 정보 전달
+        if (onExtractionInfoChange) {
+          onExtractionInfoChange(searchResult.extractionInfo)
+        }
+
         // 추가 정보를 상태로 저장 (신뢰도 표시용)
         setSearchResults(searchResult.results || [])
       } else {
         setSearchResults(searchResult.results || [])
         setExtractionInfo(null)
+
+        if (onExtractionInfoChange) {
+          onExtractionInfoChange(null)
+        }
       }
 
       setIsLoading(false)
     }
 
     performSearch()
-  }, [searchQuery, qnaDatabase, selectedCategory])
+  }, [searchQuery, uploadedImage, qnaDatabase, selectedCategory, onExtractionInfoChange])
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id)
   }
 
   const copyToClipboard = async (answer) => {
-    const text = `[${answer.category}] ${answer.question}\n\n${answer.answer}`
-    await navigator.clipboard.writeText(text)
+    await navigator.clipboard.writeText(answer.answer)
     setCopiedId(answer.id)
     setTimeout(() => setCopiedId(null), 2000)
   }
@@ -133,18 +186,40 @@ export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
                 )}
               </div>
             )}
+
+            {/* OCR 텍스트 표시 */}
+            {ocrExtractedText && (
+              <div className="mt-3 rounded-lg bg-primary/5 border border-primary/20 p-3">
+                <div className="flex items-start gap-2 mb-2">
+                  <ImageIcon className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-card-foreground mb-1">이미지에서 추출된 텍스트:</p>
+                    <p className="text-xs text-muted-foreground whitespace-pre-wrap line-clamp-3">
+                      {ocrExtractedText}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading && (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-8 gap-3">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <span className="ml-2 text-sm text-muted-foreground">검색 중...</span>
+            {isProcessingOCR ? (
+              <div className="text-center">
+                <p className="text-sm font-medium text-card-foreground">이미지에서 텍스트 추출 중...</p>
+                <p className="text-xs text-muted-foreground mt-1">잠시만 기다려주세요</p>
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground">검색 중...</span>
+            )}
           </div>
         )}
 
-        {!isLoading && searchResults.length === 0 && searchQuery && (
+        {!isLoading && searchResults.length === 0 && (searchQuery || uploadedImage) && (
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground">
               검색 결과가 없습니다.
@@ -152,10 +227,10 @@ export function PreviousAnswers({ searchQuery, selectedCategory = "all" }) {
           </div>
         )}
 
-        {!isLoading && searchResults.length === 0 && !searchQuery && (
+        {!isLoading && searchResults.length === 0 && !searchQuery && !uploadedImage && (
           <div className="text-center py-8">
             <p className="text-sm text-muted-foreground">
-              질문을 입력하면 유사한 이전 답변을 찾아드립니다.
+              질문을 입력하거나 이미지를 붙여넣으면 유사한 이전 답변을 찾아드립니다.
             </p>
           </div>
         )}

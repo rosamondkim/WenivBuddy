@@ -3,22 +3,34 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Sparkles, Copy, CheckCheck, Loader2 } from "lucide-react"
+import { Sparkles, Copy, CheckCheck, Loader2, Save } from "lucide-react"
+import { SaveAnswerDialog } from "@/components/save-answer-dialog"
 
-export function AiAnswer({ searchQuery, selectedCategory = "all" }) {
+export function AiAnswer({ searchQuery, selectedCategory = "all", extractionInfo = null, ocrText = null }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [answer, setAnswer] = useState(null)
   const [isCopied, setIsCopied] = useState(false)
   const [error, setError] = useState(null)
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
 
   const generateAnswer = async () => {
-    if (!searchQuery) return
+    // OCR 텍스트가 있으면 질문에 포함
+    let fullQuestion = searchQuery
+
+    if (ocrText) {
+      fullQuestion = searchQuery
+        ? `${searchQuery}\n\n[이미지에서 추출된 텍스트]\n${ocrText}`
+        : ocrText
+    }
+
+    if (!fullQuestion) return
 
     setIsGenerating(true)
     setError(null)
 
     try {
       console.log('🤖 [AI Answer] Calling API...')
+      console.log('📝 [AI Answer] Full question:', fullQuestion.substring(0, 200) + '...')
 
       const response = await fetch('/api/generate-answer', {
         method: 'POST',
@@ -26,7 +38,7 @@ export function AiAnswer({ searchQuery, selectedCategory = "all" }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: searchQuery,
+          question: fullQuestion,
           category: selectedCategory
         })
       })
@@ -130,8 +142,31 @@ export function AiAnswer({ searchQuery, selectedCategory = "all" }) {
                 <Sparkles className="h-3.5 w-3.5" />
                 {"다시 생성"}
               </Button>
+              {!error && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setShowSaveDialog(true)}
+                  className="gap-1.5"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  {"답변 저장하기"}
+                </Button>
+              )}
             </div>
           </div>
+        )}
+
+        {/* 답변 저장 다이얼로그 */}
+        {answer && !error && (
+          <SaveAnswerDialog
+            open={showSaveDialog}
+            onOpenChange={setShowSaveDialog}
+            question={ocrText ? (searchQuery ? `${searchQuery}\n\n${ocrText}` : ocrText) : searchQuery}
+            answer={answer}
+            initialKeywords={extractionInfo?.keywords || []}
+            initialCategory={extractionInfo?.category || selectedCategory}
+          />
         )}
       </CardContent>
     </Card>
