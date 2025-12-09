@@ -1,66 +1,73 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Search, Image as ImageIcon, X } from "lucide-react"
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Search, Image as ImageIcon, X } from "lucide-react";
 
 export function QuestionInput({ onSearch }) {
-  const [question, setQuestion] = useState("")
-  const [uploadedImage, setUploadedImage] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
-  const textareaRef = useRef(null)
+  const [question, setQuestion] = useState("");
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const textareaRef = useRef(null);
 
   // 붙여넣기 이벤트 핸들러
   const handlePaste = (e) => {
-    const items = e.clipboardData?.items
-    if (!items) return
+    const items = e.clipboardData?.items;
+    if (!items) return;
 
     // 클립보드에서 이미지 찾기
     for (let i = 0; i < items.length; i++) {
-      if (items[i].type.startsWith('image/')) {
-        e.preventDefault() // 기본 붙여넣기 동작 방지
+      if (items[i].type.startsWith("image/")) {
+        e.preventDefault(); // 기본 붙여넣기 동작 방지
 
-        const file = items[i].getAsFile()
-        if (!file) continue
+        const file = items[i].getAsFile();
+        if (!file) continue;
 
-        console.log('📋 [Paste] Image detected:', file.type)
+        console.log("📋 [Paste] Image detected:", file.type);
 
         // 이미지 파일 저장
-        setUploadedImage(file)
+        setUploadedImage(file);
 
         // 썸네일 생성
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.onloadend = () => {
-          setImagePreview(reader.result)
-        }
-        reader.readAsDataURL(file)
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
 
-        break
+        break;
       }
     }
-  }
+  };
 
   const removeImage = () => {
-    setUploadedImage(null)
-    setImagePreview(null)
-  }
+    setUploadedImage(null);
+    setImagePreview(null);
+  };
 
   const handleSubmit = () => {
     // 텍스트나 이미지 중 하나는 있어야 함
-    if (!question.trim() && !uploadedImage) return
+    if (!question.trim() && !uploadedImage) return;
 
     // 카테고리는 "all"로 고정 (LLM이 자동으로 추정)
-    console.log("[v0] Submitting question:", { question, category: "all", hasImage: !!uploadedImage })
+    console.log("[v0] Submitting question:", {
+      question,
+      category: "all",
+      hasImage: !!uploadedImage,
+    });
 
     // 텍스트와 이미지를 함께 전달
-    onSearch(question, "all", uploadedImage)
-  }
+    onSearch(question, "all", uploadedImage);
+  };
 
   return (
     <div className="mb-8 rounded-xl border border-border bg-card p-6">
       <div className="mb-4">
-        <label htmlFor="question" className="mb-2 block text-sm font-medium text-card-foreground">
+        <label
+          htmlFor="question"
+          className="mb-2 block text-sm font-medium text-card-foreground"
+        >
           {"학생 질문 입력 (선택 사항)"}
         </label>
         <Textarea
@@ -72,8 +79,9 @@ export function QuestionInput({ onSearch }) {
           onPaste={handlePaste}
           className="min-h-[120px] resize-none"
         />
-        <p className="mt-1 text-xs text-muted-foreground">
-          💡 팁: 에러 화면을 캡처한 후 Ctrl+V (Mac: Cmd+V)로 붙여넣으면 검색 시 이미지에서 텍스트가 자동 추출됩니다.
+        <p className="mt-3 text-xs text-muted-foreground">
+          💡 팁: 에러 화면을 캡처한 후 Ctrl+V (Mac: Cmd+V)로 붙여넣으면 검색 시
+          이미지에서 텍스트가 자동 추출됩니다.
         </p>
       </div>
 
@@ -100,7 +108,8 @@ export function QuestionInput({ onSearch }) {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  검색하기 버튼을 누르면 이미지에서 텍스트가 자동으로 추출됩니다.
+                  검색하기 버튼을 누르면 이미지에서 텍스트가 자동으로
+                  추출됩니다.
                 </p>
               </div>
 
@@ -128,5 +137,5 @@ export function QuestionInput({ onSearch }) {
         {"검색하기"}
       </Button>
     </div>
-  )
+  );
 }

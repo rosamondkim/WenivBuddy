@@ -162,7 +162,8 @@ export function AiAnswer({ searchQuery, selectedCategory = "all", extractionInfo
           <SaveAnswerDialog
             open={showSaveDialog}
             onOpenChange={setShowSaveDialog}
-            question={ocrText ? (searchQuery ? `${searchQuery}\n\n${ocrText}` : ocrText) : searchQuery}
+            question={searchQuery || ''}
+            ocrText={ocrText}
             answer={answer}
             initialKeywords={extractionInfo?.keywords || []}
             initialCategory={extractionInfo?.category || selectedCategory}

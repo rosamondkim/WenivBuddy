@@ -2,13 +2,49 @@ import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 
+export const dynamic = 'force-dynamic'
+
+/**
+ * title 자동 생성
+ */
+function generateTitle(body, ocrErrorLine) {
+  if (ocrErrorLine) {
+    const bodyShort = body.length > 30 ? body.substring(0, 30) + '...' : body
+    const errorShort = ocrErrorLine.length > 50 ? ocrErrorLine.substring(0, 50) + '...' : ocrErrorLine
+    return `${bodyShort} - ${errorShort}`
+  }
+  return body.length > 100 ? body.substring(0, 100) + '...' : body
+}
+
+/**
+ * tags 자동 생성
+ */
+function generateTags(ocrText, keywords, category) {
+  const tags = []
+  const combinedText = `${ocrText || ''} ${keywords.join(' ')}`.toLowerCase()
+
+  if (/c:\\|ps |windows|powershell/i.test(combinedText)) tags.push('Windows')
+  if (/powershell|ps1/i.test(combinedText)) tags.push('PowerShell')
+  if (/\bnpm\b/i.test(combinedText)) tags.push('npm')
+  if (/\bnode\b|nodejs/i.test(combinedText)) tags.push('Node.js')
+  if (/\breact\b/i.test(combinedText)) tags.push('React')
+  if (/\bgit\b/i.test(combinedText)) tags.push('Git')
+  if (/\bcss\b|flexbox|grid/i.test(combinedText)) tags.push('CSS')
+  if (/vscode|vs code|visual studio code/i.test(combinedText)) tags.push('VSCode')
+  if (/express/i.test(combinedText)) tags.push('Express')
+
+  if (tags.length === 0 && category) tags.push(category)
+
+  return [...new Set(tags)]
+}
+
 /**
  * Q&A 데이터베이스에 새 답변 추가
  * POST /api/qna/add
  */
 export async function POST(request) {
   try {
-    const { question, answer, category, keywords } = await request.json()
+    const { question, answer, category, author = '익명', keywords, ocrText = null } = await request.json()
 
     // 입력값 검증
     if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -63,14 +99,27 @@ export async function POST(request) {
     const maxId = Math.max(...existingIds, 0)
     const newId = `qna-${String(maxId + 1).padStart(3, '0')}`
 
-    // 새 Q&A 항목 생성
+    // body와 ocrText 분리
+    const body = question.trim()
+    const ocrTextTrimmed = ocrText ? ocrText.trim() : null
+    const ocrErrorLine = ocrTextTrimmed ? ocrTextTrimmed.split('\n')[0].trim() : null
+
+    // title과 tags 자동 생성
+    const title = generateTitle(body, ocrErrorLine)
+    const tags = generateTags(ocrTextTrimmed, keywords, category)
+
+    // 새 Q&A 항목 생성 (새 스키마)
     const newQnA = {
       id: newId,
       category,
-      question: question.trim(),
+      title,
+      body,
+      ocrText: ocrTextTrimmed,
+      ocrErrorLine,
+      tags,
       keywords,
       answer: answer.trim(),
-      author: 'AI 생성 (사용자 추가)',
+      author: author.trim() || '익명',
       timestamp: new Date().toISOString(),
       views: 0
     }

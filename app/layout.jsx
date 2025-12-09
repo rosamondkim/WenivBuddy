@@ -4,11 +4,11 @@ import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-geist"
+  variable: "--font-geist",
 });
 const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-geist-mono"
+  variable: "--font-geist-mono",
 });
 
 export const metadata = {
@@ -18,26 +18,28 @@ export const metadata = {
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/favicon.svg",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/favicon.svg",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
+        url: "/favicon.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/apple-favicon.svg",
   },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body
+        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
+      >
         {children}
         <Analytics />
       </body>

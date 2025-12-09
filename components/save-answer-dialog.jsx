@@ -31,13 +31,40 @@ const CATEGORIES = [
   { value: "도구", label: "도구" }
 ]
 
-export function SaveAnswerDialog({ open, onOpenChange, question, answer, initialKeywords = [], initialCategory = "all" }) {
+export function SaveAnswerDialog({ open, onOpenChange, question, ocrText = null, answer, initialKeywords = [], initialCategory = "all" }) {
   const [isSaving, setIsSaving] = useState(false)
   const [editedQuestion, setEditedQuestion] = useState(question)
   const [editedAnswer, setEditedAnswer] = useState(answer)
   const [selectedCategory, setSelectedCategory] = useState(initialCategory === "all" ? "Frontend" : initialCategory)
+  const [author, setAuthor] = useState("")
   const [keywordsInput, setKeywordsInput] = useState(initialKeywords.join(", "))
   const [error, setError] = useState(null)
+
+  // Tab 키 핸들러 (들여쓰기 지원)
+  const handleKeyDown = (e, field) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+
+      const textarea = e.target
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      const value = textarea.value
+
+      // Tab 문자 삽입
+      const newValue = value.substring(0, start) + '\t' + value.substring(end)
+
+      if (field === 'question') {
+        setEditedQuestion(newValue)
+      } else if (field === 'answer') {
+        setEditedAnswer(newValue)
+      }
+
+      // 커서 위치 조정
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 1
+      }, 0)
+    }
+  }
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -73,7 +100,9 @@ export function SaveAnswerDialog({ open, onOpenChange, question, answer, initial
           question: editedQuestion,
           answer: editedAnswer,
           category: selectedCategory,
-          keywords
+          author: author.trim() || '익명',
+          keywords,
+          ocrText: ocrText || null
         })
       })
 
@@ -128,6 +157,17 @@ export function SaveAnswerDialog({ open, onOpenChange, question, answer, initial
             </Select>
           </div>
 
+          {/* 작성자 입력 */}
+          <div className="grid gap-2">
+            <Label htmlFor="author">작성자</Label>
+            <Input
+              id="author"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="작성자 이름을 입력하세요 (선택사항, 기본값: 익명)"
+            />
+          </div>
+
           {/* 질문 입력 */}
           <div className="grid gap-2">
             <Label htmlFor="question">질문</Label>
@@ -135,6 +175,7 @@ export function SaveAnswerDialog({ open, onOpenChange, question, answer, initial
               id="question"
               value={editedQuestion}
               onChange={(e) => setEditedQuestion(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, 'question')}
               rows={3}
               placeholder="질문을 입력하세요"
             />
@@ -147,7 +188,8 @@ export function SaveAnswerDialog({ open, onOpenChange, question, answer, initial
               id="answer"
               value={editedAnswer}
               onChange={(e) => setEditedAnswer(e.target.value)}
-              rows={8}
+              onKeyDown={(e) => handleKeyDown(e, 'answer')}
+              rows={15}
               placeholder="답변을 입력하세요"
             />
           </div>

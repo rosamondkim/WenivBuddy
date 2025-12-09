@@ -1,6 +1,41 @@
 import { NextResponse } from 'next/server'
 
 /**
+ * Hallucination 감지 함수
+ * OCR 결과가 환각인지 확인
+ *
+ * 주의: 특정 키워드 자체를 차단하는 것이 아니라,
+ * 매우 의심스러운 "패턴 조합"만 감지합니다.
+ */
+function isHallucination(text) {
+  if (!text) return false
+
+  // [NO_TEXT] 응답
+  const looksNoText = /\[NO_TEXT\]/i.test(text)
+  if (looksNoText) return true
+
+  // 비정상적으로 긴 텍스트 (일반적인 스크린샷보다 훨씬 김)
+  const tooLong = text.length > 1500
+  if (tooLong) {
+    console.warn(`⚠️ [OCR] Text too long (${text.length} chars) - possible hallucination`)
+    return true
+  }
+
+  // 매우 구체적인 환각 패턴만 차단
+  // "gemini" 명령어와 PowerShell 에러가 동시에 나타나는 패턴
+  // (실제 이미지에 gemini가 없는데 이런 텍스트가 나오면 환각)
+  const suspiciousGeminiPattern = /gemini.*powershell.*executionpolic/is
+
+  if (suspiciousGeminiPattern.test(text)) {
+    console.warn('⚠️ [OCR] Suspicious gemini+powershell pattern detected')
+    return true
+  }
+
+  // 기타 환각 패턴은 일단 허용 (OCR 프롬프트 개선으로 해결)
+  return false
+}
+
+/**
  * OpenAI Vision API를 사용한 OCR (이미지에서 텍스트 추출)
  * POST /api/ocr
  */
@@ -49,24 +84,19 @@ export async function POST(request) {
         messages: [
           {
             role: 'system',
-            content: `당신은 에러 화면 및 코드 스크린샷에서 텍스트를 추출하는 전문가입니다.
-이미지에서 보이는 모든 텍스트, 에러 메시지, 코드, 경로 등을 정확하게 추출해주세요.
-
-추출 규칙:
-1. 에러 메시지가 있다면 가장 먼저 추출
-2. 코드는 들여쓰기를 유지하여 추출
-3. 파일 경로, URL이 있다면 정확하게 추출
-4. 줄 번호가 있다면 포함
-5. 불필요한 UI 요소 (버튼 텍스트, 메뉴 등)는 제외
-
-텍스트만 반환하고, 추가 설명은 하지 마세요.`
+            content: `당신은 에러/코드 스크린샷에서 "보이는 텍스트만" 추출하는 OCR 도우미입니다.
+- 추측·추론·생성 금지. 이미지에 없는 단어/문장은 절대 만들지 마세요.
+- 텍스트가 전혀 없으면 [NO_TEXT]만 반환하세요.
+- UI 버튼/메뉴/툴팁 등 불필요한 UI 텍스트는 제외하세요.
+- 코드/에러/파일 경로가 보이면 줄바꿈과 들여쓰기를 유지해 그대로 적으세요.
+- 확신이 없으면 해당 줄을 생략하거나 [UNCERTAIN]으로 표시하지 말고, 아예 적지 마세요.`
           },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: '이 이미지에서 에러 메시지와 관련 코드/정보를 추출해주세요.'
+                text: '아래 이미지에서 보이는 실제 텍스트(에러, 코드, 경로 등)를 그대로 추출해주세요. 추가 설명 없이 텍스트만 반환하세요. 텍스트가 없으면 [NO_TEXT].'
               },
               {
                 type: 'image_url',
@@ -78,8 +108,8 @@ export async function POST(request) {
             ]
           }
         ],
-        max_tokens: 2000,
-        temperature: 0.1
+        max_tokens: 1500,
+        temperature: 0
       })
     })
 
@@ -110,10 +140,29 @@ export async function POST(request) {
     const data = await response.json()
 
     // OpenAI API 응답에서 추출된 텍스트
-    const extractedText = data.choices[0].message.content
+    const extractedText = data.choices[0].message.content.trim()
 
-    console.log(`✅ [OCR] Successfully extracted text (${extractedText.length} chars, ${data.usage.total_tokens} tokens)`)
-    console.log(`📝 [OCR] Preview: ${extractedText.substring(0, 200)}...`)
+    console.log(`📊 [OCR] Extracted text length: ${extractedText.length} chars`)
+    console.log(`📝 [OCR] Full extracted text:\n${extractedText}`)
+    console.log(`💰 [OCR] Token usage: ${data.usage.total_tokens} tokens`)
+
+    // Hallucination 검증
+    if (isHallucination(extractedText)) {
+      console.warn(`❌ [OCR] Hallucination detected - returning empty text`)
+      console.log(`📝 [OCR] Suspicious text: ${extractedText.substring(0, 300)}...`)
+
+      // 환각으로 판단되면 빈 결과 반환
+      return NextResponse.json({
+        text: '',
+        model: 'gpt-4o-mini',
+        usage: data.usage,
+        note: 'hallucination suspected - returned empty text',
+        imageSize: imageFile.size,
+        imageType: imageFile.type
+      })
+    }
+
+    console.log(`✅ [OCR] Validation passed - returning extracted text`)
 
     return NextResponse.json({
       text: extractedText,

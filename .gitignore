@@ -47,3 +47,4 @@ next-env.d.ts
 
 # Lock files (pnpm 사용 시 npm lock 무시)
 package-lock.json
+public/uploads/
