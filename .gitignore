@@ -43,7 +43,6 @@ next-env.d.ts
 *~
 
 # Claude Code
-.claude/
 
 # Lock files (pnpm 사용 시 npm lock 무시)
 package-lock.json
