@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
 /**
  * OpenAI API를 사용한 질문 답변 생성 API 엔드포인트
@@ -6,40 +6,40 @@ import { NextResponse } from 'next/server'
  */
 export async function POST(request) {
   try {
-    const { question, category = 'all' } = await request.json()
+    const { question, category = "all" } = await request.json();
 
-    if (!question || typeof question !== 'string') {
+    if (!question || typeof question !== "string") {
       return NextResponse.json(
-        { error: 'Invalid question parameter' },
+        { error: "Invalid question parameter" },
         { status: 400 }
-      )
+      );
     }
 
     // API 키 확인
-    const apiKey = process.env.OPENAI_API_KEY
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      console.warn('⚠️ OPENAI_API_KEY not found in environment variables')
+      console.warn("⚠️ OPENAI_API_KEY not found in environment variables");
       return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
+        { error: "OpenAI API key not configured" },
         { status: 500 }
-      )
+      );
     }
 
-    console.log(`🤖 [AI Answer] Generating answer for: "${question}"`)
+    console.log(`🤖 [AI Answer] Generating answer for: "${question}"`);
 
     // OpenAI API 호출
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: "gpt-4o-mini",
         messages: [
           {
-            role: 'system',
-            content: `당신은 위니브 부트캠프에서 학생 바로 옆에서 도와주는 멘토입니다.
+            role: "system",
+            content: `당신은 위니브 부트캠프에서 학생을 온라인으로 도와주는 멘토입니다.
 학생이 질문하면 마치 실제로 옆에서 대화하듯이 자연스럽게 답변해주세요.
 
 [톤 & 스타일]
@@ -72,48 +72,52 @@ export async function POST(request) {
 - 반말투 ("~해요", "~봤어요?", "~죠") → 정중한 대화체 ("~합니다", "~보셨나요?", "~해보실래요?")
 - 튜토리얼처럼 불필요하게 긴 설명
 - 매뉴얼 문서처럼 딱딱한 문단 구조
-- 질문자의 상황을 고려하지 않은 일반론적 설명`
+- 질문자의 상황을 고려하지 않은 일반론적 설명`,
           },
           {
-            role: 'user',
-            content: category !== 'all'
-              ? `[${category}] ${question}`
-              : question
-          }
+            role: "user",
+            content:
+              category !== "all" ? `[${category}] ${question}` : question,
+          },
         ],
         temperature: 0.7,
-        max_tokens: 2000
-      })
-    })
+        max_tokens: 2000,
+      }),
+    });
 
     if (!response.ok) {
-      const errorText = await response.text()
-      console.error('❌ [AI Answer] OpenAI API error:', response.status, errorText)
+      const errorText = await response.text();
+      console.error(
+        "❌ [AI Answer] OpenAI API error:",
+        response.status,
+        errorText
+      );
       return NextResponse.json(
         { error: `OpenAI API error: ${response.status}` },
         { status: response.status }
-      )
+      );
     }
 
-    const data = await response.json()
+    const data = await response.json();
 
     // OpenAI API 응답에서 결과 추출
-    const answer = data.choices[0].message.content
+    const answer = data.choices[0].message.content;
 
-    console.log(`✅ [AI Answer] Successfully generated answer (${data.usage.completion_tokens} tokens)`)
+    console.log(
+      `✅ [AI Answer] Successfully generated answer (${data.usage.completion_tokens} tokens)`
+    );
 
     return NextResponse.json({
       answer,
-      model: 'gpt-4o-mini',
+      model: "gpt-4o-mini",
       usage: data.usage,
-      category
-    })
-
+      category,
+    });
   } catch (error) {
-    console.error('❌ [AI Answer] Error:', error)
+    console.error("❌ [AI Answer] Error:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { error: error.message || "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
