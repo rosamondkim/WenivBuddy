@@ -1,4 +1,44 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
+import { filterOCRText } from '@/lib/ocr-text-filter'
+
+/**
+ * OCR 결과 캐시 (이미지 해시 기반)
+ * 같은 이미지로 재검색 시 중복 OCR 호출 방지
+ */
+const ocrCache = new Map()
+const CACHE_TTL = 15 * 60 * 1000 // 15분
+const MAX_CACHE_SIZE = 100
+
+/**
+ * 이미지 해시 계산 (MD5)
+ */
+function calculateImageHash(buffer) {
+  return crypto.createHash('md5').update(buffer).digest('hex')
+}
+
+/**
+ * 캐시 정리 (오래된 항목 및 크기 제한)
+ */
+function cleanCache() {
+  const now = Date.now()
+
+  // 만료된 항목 제거
+  for (const [hash, entry] of ocrCache.entries()) {
+    if (now - entry.timestamp > CACHE_TTL) {
+      ocrCache.delete(hash)
+    }
+  }
+
+  // 크기 제한 초과 시 오래된 항목부터 제거
+  if (ocrCache.size > MAX_CACHE_SIZE) {
+    const entries = Array.from(ocrCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp)
+
+    const toDelete = entries.slice(0, ocrCache.size - MAX_CACHE_SIZE)
+    toDelete.forEach(([hash]) => ocrCache.delete(hash))
+  }
+}
 
 /**
  * Hallucination 감지 함수
@@ -67,6 +107,26 @@ export async function POST(request) {
     // 이미지를 base64로 인코딩
     const bytes = await imageFile.arrayBuffer()
     const buffer = Buffer.from(bytes)
+
+    // 이미지 해시 계산
+    const imageHash = calculateImageHash(buffer)
+    console.log(`🔑 [OCR Cache] Image hash: ${imageHash}`)
+
+    // 캐시 확인
+    cleanCache() // 캐시 정리
+    const cachedResult = ocrCache.get(imageHash)
+
+    if (cachedResult) {
+      console.log(`✅ [OCR Cache] Cache hit! Returning cached result`)
+      return NextResponse.json({
+        ...cachedResult.data,
+        cached: true,
+        cacheAge: Date.now() - cachedResult.timestamp
+      })
+    }
+
+    console.log(`❌ [OCR Cache] Cache miss - calling OpenAI API`)
+
     const base64Image = buffer.toString('base64')
 
     // 이미지 타입 확인
@@ -143,15 +203,13 @@ export async function POST(request) {
     const extractedText = data.choices[0].message.content.trim()
 
     console.log(`📊 [OCR] Extracted text length: ${extractedText.length} chars`)
-    console.log(`📝 [OCR] Full extracted text:\n${extractedText}`)
     console.log(`💰 [OCR] Token usage: ${data.usage.total_tokens} tokens`)
 
     // Hallucination 검증
     if (isHallucination(extractedText)) {
       console.warn(`❌ [OCR] Hallucination detected - returning empty text`)
-      console.log(`📝 [OCR] Suspicious text: ${extractedText.substring(0, 300)}...`)
 
-      // 환각으로 판단되면 빈 결과 반환
+      // 환각으로 판단되면 빈 결과 반환 (캐시에는 저장하지 않음)
       return NextResponse.json({
         text: '',
         model: 'gpt-4o-mini',
@@ -164,13 +222,33 @@ export async function POST(request) {
 
     console.log(`✅ [OCR] Validation passed - returning extracted text`)
 
-    return NextResponse.json({
-      text: extractedText,
+    // 터미널 에러 텍스트 정제 (프롬프트, 경로 등 제거)
+    const filteredText = filterOCRText(extractedText)
+    const reductionPercent = Math.round((1 - filteredText.length / extractedText.length) * 100)
+
+    if (filteredText !== extractedText) {
+      console.log(`🔧 [OCR] Text filtered: ${extractedText.length} → ${filteredText.length} chars (${reductionPercent}% reduction)`)
+    }
+
+    // 성공한 결과를 캐시에 저장 (정제된 텍스트 사용)
+    const result = {
+      text: filteredText,
+      originalText: extractedText,  // 디버깅용 원본 보관
       model: 'gpt-4o-mini',
       usage: data.usage,
       imageSize: imageFile.size,
-      imageType: imageFile.type
+      imageType: imageFile.type,
+      filtered: filteredText !== extractedText  // 필터링 여부
+    }
+
+    ocrCache.set(imageHash, {
+      data: result,
+      timestamp: Date.now()
     })
+
+    console.log(`💾 [OCR Cache] Cached result for hash: ${imageHash} (cache size: ${ocrCache.size})`)
+
+    return NextResponse.json(result)
 
   } catch (error) {
     console.error('❌ [OCR] Error:', error)

@@ -29,16 +29,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-
-const CATEGORIES = [
-  { value: "Front-end", label: "Front-end" },
-  { value: "Back-end", label: "Back-end" },
-  { value: "Figma", label: "Figma" },
-  { value: "Git/GitHub", label: "Git/GitHub" },
-  { value: "Terminal", label: "Terminal" },
-  { value: "VSC", label: "VSC" },
-  { value: "기타", label: "기타" },
-];
+import { CATEGORIES } from "@/lib/constants";
 
 export function AddQnAForm({ isOpen, onClose }) {
   const [question, setQuestion] = useState("");
@@ -48,6 +39,7 @@ export function AddQnAForm({ isOpen, onClose }) {
   const [keywords, setKeywords] = useState([]); // 배열로 변경
   const [extractionSource, setExtractionSource] = useState(null); // 추출 방식 표시용
   const [ocrText, setOcrText] = useState(""); // 이미지 OCR 텍스트
+  const [questionImageUrl, setQuestionImageUrl] = useState(""); // 질문 이미지 URL
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -194,31 +186,59 @@ export function AddQnAForm({ isOpen, onClose }) {
       ]);
 
       console.log(`✅ [Add QnA] Image uploaded: ${imageUrl}`);
-      if (extractedText) {
-        setOcrText((prev) => `${prev}\n\n${extractedText}`.trim());
-      }
 
-      // 현재 textarea 참조 가져오기
-      const textarea =
-        field === "question" ? questionRef.current : answerRef.current;
-
-      if (textarea) {
-        const { newValue, newCursorPos } = insertImageMarkdown(
-          textarea,
-          imageUrl
-        );
-
-        if (field === "question") {
+      // 질문 필드에 이미지 붙여넣기
+      if (field === "question") {
+        // OCR 텍스트를 ocrText에 저장
+        if (extractedText) {
+          setOcrText((prev) => `${prev}\n\n${extractedText}`.trim());
+          console.log(`✅ [Add QnA] OCR text extracted`);
+        }
+        
+        // 이미지 마크다운을 질문 본문에 삽입 (OCR 텍스트는 추가하지 않음)
+        const textarea = questionRef.current;
+        if (textarea) {
+          const { newValue, newCursorPos } = insertImageMarkdown(
+            textarea,
+            imageUrl
+          );
           setQuestion(newValue);
+
+          // 커서 위치 복원
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+          }, 0);
         } else {
-          setAnswer(newValue);
+          // textarea가 없으면 직접 설정
+          const imageMarkdown = `![이미지](${imageUrl})`;
+          setQuestion(imageMarkdown);
+        }
+        
+        // 이미지 URL 저장 (검색 결과에서 표시용)
+        setQuestionImageUrl(imageUrl);
+        console.log(`✅ [Add QnA] Question image URL saved: ${imageUrl}`);
+      }
+      // 답변 필드에 이미지 붙여넣기 (기존 로직 유지)
+      else {
+        if (extractedText) {
+          setOcrText((prev) => `${prev}\n\n${extractedText}`.trim());
         }
 
-        // 커서 위치 복원
-        setTimeout(() => {
-          textarea.focus();
-          textarea.setSelectionRange(newCursorPos, newCursorPos);
-        }, 0);
+        const textarea = answerRef.current;
+        if (textarea) {
+          const { newValue, newCursorPos } = insertImageMarkdown(
+            textarea,
+            imageUrl
+          );
+          setAnswer(newValue);
+
+          // 커서 위치 복원
+          setTimeout(() => {
+            textarea.focus();
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+          }, 0);
+        }
       }
     } catch (err) {
       console.error("❌ [Add QnA] Image processing error:", err);
@@ -310,6 +330,7 @@ export function AddQnAForm({ isOpen, onClose }) {
           author: author.trim() || "익명",
           keywords: finalKeywords,
           ocrText: ocrText.trim(), // OCR 텍스트 추가
+          imageUrl: questionImageUrl || null, // 질문 이미지 URL 추가
         }),
       });
 
@@ -332,6 +353,7 @@ export function AddQnAForm({ isOpen, onClose }) {
         setKeywords([]);
         setExtractionSource(null);
         setOcrText(""); // OCR 텍스트 리셋
+        setQuestionImageUrl(""); // 질문 이미지 URL 리셋
         setSuccess(false);
         onClose();
       }, 1500);

@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request) {
   try {
-    const { query, category = 'all', maxResults = 3, minSimilarity = 0.15, isOCR = false } = await request.json()
+    const { query, category = 'all', maxResults = 3, minSimilarity = 0.7, isOCR = false } = await request.json()
 
     // 입력값 검증
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
@@ -69,6 +69,7 @@ export async function POST(request) {
     )
   }
 }
+
 
 
 

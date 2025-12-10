@@ -1,31 +1,6 @@
 {
   "qnaList": [
     {
-      "id": "qna-001",
-      "category": "Terminal",
-      "title": "VSC에서 SVG 이미지를 클릭했을 때, 강사님처럼 코드가 나오는게 아니라 전 이미지가 나와요!",
-      "body": "VSC에서 SVG 이미지를 클릭했을 때, 강사님처럼 코드가 나오는게 아니라 전 이미지가 나와요!",
-      "ocrText": null,
-      "ocrErrorLine": null,
-      "tags": [
-        "VSCode"
-      ],
-      "keywords": [
-        "VSC",
-        "VSCode",
-        "SVG",
-        "이미지",
-        "코드",
-        "뷰어",
-        "에디터"
-      ],
-      "answer": "VS Code에서 SVG 파일을 클릭했을 때 이미지로 보이는 것은 기본 설정 때문입니다.\n\nSVG 파일을 코드로 보려면:\n1. SVG 파일에서 마우스 우클릭\n2. '연결 프로그램...' 또는 'Open With...' 선택\n3. 'Text Editor' 또는 '텍스트 편집기' 선택\n\n또는 확장 프로그램을 사용할 수 있습니다:\n- 'SVG' 확장 프로그램 설치\n- 설정에서 기본 에디터를 텍스트 편집기로 변경\n\n단축키로는 SVG 파일을 선택하고 Ctrl+K, Ctrl+O (Mac: Cmd+K, Cmd+O)를 누르면 편집기 선택 옵션이 나타납니다.",
-      "author": "김민승",
-      "timestamp": "2024-12-01T10:30:00",
-      "views": 42,
-      "imageUrl": "/images/vscode-svg-settings.png"
-    },
-    {
       "id": "qna-003",
       "category": "Terminal",
       "title": "PowerShell에서 npm/yarn 설치 시 스크립트 실행 오류 (ExecutionPolicy)",
@@ -60,149 +35,204 @@
       "views": 0
     },
     {
-      "id": "qna-002",
-      "category": "Git",
-      "title": "Git merge 시 conflict 발생 해결 방법",
-      "body": "git merge 하려고 하는데 CONFLICT (content): Merge conflict in src/App.js 이런 오류가 나와요.ㅜㅜ ",
-      "ocrText": null,
-      "ocrErrorLine": null,
-      "tags": [
-        "Git",
-        "merge",
-        "conflict",
-        "버전관리"
-      ],
-      "keywords": [
-        "Git",
-        "merge",
-        "conflict",
-        "충돌",
-        "해결",
-        "브랜치",
-        "병합",
-        "오류"
-      ],
-      "answer": "머지 충돌이 발생했네요! 걱정 마세요, 차근차근 해결해볼게요.\n\n1. 먼저 충돌이 발생한 파일을 열어주세요\n`src/App.js` 파일을 VS Code나 에디터로 열면 이런 표시가 보일 거예요:\n```\n<<<<<<< HEAD\n현재 브랜치의 코드\n=======\n병합하려는 브랜치의 코드\n>>>>>>> feature-branch\n```\n\n2. 원하는 코드를 선택하거나 둘 다 합쳐주세요\n- VS Code 사용 중이시면 `Accept Current Change`, `Accept Incoming Change`, `Accept Both Changes` 버튼이 보일 거예요!\n- 또는 직접 `<<<<<<<`, `=======`, `>>>>>>>` 표시를 지우고 원하는 코드만 남기시면 됩니다.\n\n3. 저장 후 다시 커밋해주세요\n```bash\ngit add .\ngit commit -m \"Resolve merge conflict\"\n```\n\n이렇게 하면 충돌이 해결됩니다! 해보시고 안 되면 말씀해주실래요?",
-      "author": "로지",
-      "timestamp": "2025-12-09T14:23:15.123Z",
-      "views": 0
-    },
-    {
-      "id": "qna-007",
+      "id": "qna-004",
       "category": "Terminal",
-      "title": "npm install 시 ERR! code EACCES 권한 오류",
-      "body": "npm install 하면 npm ERR! code EACCES 이런 메시지가 떠요",
+      "title": "윈도우에서 명령 프롬프트(cmd) 를 어떻게 여나요?",
+      "body": "윈도우에서 명령 프롬프트(cmd) 를 어떻게 여나요?",
       "ocrText": null,
       "ocrErrorLine": null,
       "tags": [
-        "npm",
-        "Node.js",
-        "권한",
-        "오류"
+        "Windows"
       ],
       "keywords": [
-        "npm",
-        "install",
-        "EACCES",
-        "권한",
-        "오류",
-        "에러",
-        "permission",
-        "sudo"
+        "Terminal",
+        "터미널",
+        "명령",
+        "아래",
+        "방법",
+        "편한",
+        "따라",
+        "윈도우",
+        "cmd",
+        "프롬프트",
+        "뜨면 cmd",
+        "프롬프트 cmd",
+        "검색창에 cmd",
+        "windows 키",
+        "키보드에서 windows"
       ],
-      "answer": "권한 문제네요! !\n\n**Mac/Linux 환경이신가요? :**\n\n1. **npm 디렉토리 소유권 변경 (추천 방법!)**\n```bash\nsudo chown -R $USER /usr/local/lib/node_modules\nsudo chown -R $USER /usr/local/bin\nsudo chown -R $USER /usr/local/share\n```\n\n2. **또는 nvm 사용하기 (더 추천!)**\nnvm으로 Node.js를 설치하면 이런 문제가 안 생겨요:\n```bash\n# nvm 설치\ncurl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash\n\n# Node.js 설치\nnvm install --lts\n```\n\n**Windows 사용자라면:**\nPowerShell을 관리자 권한으로 실행하고 다시 시도해보세요!\n\n**주의사항:**\n`sudo npm install`은 일단 사용하지 마세요! 나중에 더 큰 문제가 생길 수 있어요.\n\n해보시고 어느 운영체제 쓰시는지, 결과가 어떤지 말씀해주실래요?",
-      "author": "로지",
-      "timestamp": "2025-12-09T17:32:11.234Z",
-      "views": 0
+      "answer": "아래 방법 중 편한 걸로 따라 해보세요!\n\n1. 실행 창에서 열기\n키보드에서 Windows 키 + R 을 누릅니다.\n실행 창이 뜨면 cmd 를 입력하고 엔터를 눌러주세요.\n\n2. 시작 메뉴에서 찾기\n시작 버튼을 누른 뒤, 검색창에 cmd 또는 명령 프롬프트를 입력합니다.\n검색 결과에 나오는 명령 프롬프트를 클릭해서 실행하면 됩니다.\n이미지 링크: /uploads/1765298502918-c5c61d89e3bdb192.png\n\n안 되면, 어떤 화면까지 나오는지 캡처해서 보여주세요. 😊",
+      "author": "베니",
+      "timestamp": "2025-12-10T00:59:17.485Z",
+      "views": 0,
+      "imageUrl": null
     },
     {
-      "id": "qna-008",
-      "category": "환경설정",
-      "title": ".env 파일 환경변수가 undefined로 나와요",
-      "body": "React 프로젝트에서 .env 파일 만들고 환경변수 설정했는데 undefined가 나옵니다",
-      "ocrText": null,
-      "ocrErrorLine": null,
-      "tags": [
-        "React",
-        "환경변수",
-        ".env",
-        "설정"
-      ],
-      "keywords": [
-        "환경변수",
-        ".env",
-        "undefined",
-        "React",
-        "REACT_APP",
-        "process.env",
-        "설정",
-        "변수"
-      ],
-      "answer": ".env 파일 설정에는 몇 가지 규칙이 있어요! 하나씩 체크해볼게요.\n\n**1. Create React App이라면 (가장 흔한 실수!)**\n환경변수 이름이 `REACT_APP_`로 시작해야 해요!\n\n❌ **잘못된 예:**\n```\nAPI_KEY=abc123\nBASE_URL=https://api.example.com\n```\n\n✅ **올바른 예:**\n```\nREACT_APP_API_KEY=abc123\nREACT_APP_BASE_URL=https://api.example.com\n```\n\n**2. 사용할 때:**\n```javascript\nconst apiKey = process.env.REACT_APP_API_KEY;\nconsole.log(apiKey); // 이제 값이 나올 거예요!\n```\n\n**3. 주의사항:**\n- .env 파일은 프로젝트 **루트 폴더**에 있어야 해요 (package.json이 있는 곳)\n- .env 파일 수정 후엔 **개발 서버를 재시작**해야 해요!\n- 따옴표 없이 작성하세요: `REACT_APP_KEY=value` (❌ `REACT_APP_KEY=\"value\"`)\n\n**4. Vite 사용 중이라면:**\n`VITE_`로 시작해야 해요!\n```\nVITE_API_KEY=abc123\n```\n\n위 내용대로 수정하시고 서버 재시작 후 다시 시도해보실래요?",
-      "author": "지지",
-      "timestamp": "2025-12-09T18:55:28.567Z",
-      "views": 0
-    },
-    {
-      "id": "qna-009",
+      "id": "qna-005",
       "category": "VSC",
-      "title": "VSC에서 확장 프로그램이 설치는 되었으나 익스텐션이 ... - Live Server",
-      "body": "VSC에서 확장 프로그램이 설치는 되었으나 익스텐션이 동작하지 않아요.",
-      "ocrText": "Live Server  \nRitwick Dey  \n70,618,362  \nLaunch a development local Server with...  \nDisable  \nUninstall  \nAuto Update",
-      "ocrErrorLine": "Live Server",
+      "title": "SVG를 클릭하면 코드가 아니라 이미지로만 열려요",
+      "body": "SVG를 클릭하면 코드가 아니라 이미지로만 열려요",
+      "ocrText": "```\n'favicon.svg' 편집기 선택\n텍스트 편집기 활성화 및 기본값\n기본 제공\n'*.svg'에 대한 기본 편집기 구성...\n```",
+      "ocrErrorLine": "```",
       "tags": [
         "VSCode"
       ],
       "keywords": [
-        "확장",
-        "설치",
-        "설치는",
-        "프로그램",
-        "되었으나",
-        "익스텐션",
-        "프로그램이",
-        "익스텐션이",
-        "vsc에서 확장",
-        "확장 프로그램이",
-        "설치는 되었으나",
-        "프로그램이 설치는",
-        "되었으나 익스텐션이",
-        "vscode에서 확장"
+        "VSC",
+        "VSCode",
+        "코드",
+        "기본",
+        "설정",
+        "열려요",
+        "이미지",
+        "이미지로",
+        "code",
+        "미리보기",
+        "vs code",
+        "code 기본",
+        "logo svg",
+        "svg 파일에서",
+        "placeholder logo"
       ],
-      "answer": "아래 그림처럼 확장 프로그램이 Disabled(사용안함)로 설정되어 있으면 올바르게 동작하지 않아요. \n\n![이미지](/uploads/1765298352793-07796d0d35b71c97.png)",
-      "author": "하티",
-      "timestamp": "2025-12-09T16:39:34.510Z",
-      "views": 0
+      "answer": "VS Code 기본 설정이 SVG를 이미지로 미리보기 하도록 되어 있어서 그래요.\nSVG를 코드로 보고 싶다면, 편집기 연결 설정을 바꾸면 됩니다.\n\n파일에서 직접 연결 프로그램 변경 (추천)\n1.placeholder-logo.svg 파일에서 마우스 오른쪽 버튼 클릭\n2. “연결 프로그램...” 항목을 클릭\n3. 상단에 뜨는 옵션 중에서 “텍스트 편집기”를 선택해 주세요.\n![이미지](/uploads/1765329402500-a60fdab0b7bc713a.png)\n\n방법 2. settings.json에서 직접 설정\nCmd + Shift + P (Mac) 또는 Ctrl + Shift + P (Windows) 로 명령 팔레트를 엽니다.\n`settings.json` 을 검색해서 [사용자 설정 열기] 를 선택합니다.\n파일 안에서 `workbench.editorAssociations` 라고 검색하면 아래와 같은 설정을 볼 수 있어요.\n```\n\"workbench.editorAssociations\": {\n  \"*.svg\": \"default\"\n}\n```\n*.svg 항목을 텍스트 편집기로 설정해 주면,\n앞으로 SVG가 코드 형식으로 열리게 됩니다.\n \n\n해보시고 말씀해주세요!",
+      "author": "로지",
+      "timestamp": "2025-12-10T01:17:41.912Z",
+      "views": 0,
+      "imageUrl": null
     },
     {
-      "id": "qna-010",
+      "id": "qna-006",
       "category": "Terminal",
-      "title": "윈도우에서 명령 프롬프트 어떻게 여나요? - 명령 프롬프트",
-      "body": "윈도우에서 명령 프롬프트 어떻게 여나요?",
-      "ocrText": "명령 프롬프트  \ncmd  \ncmd - 검색 결과 더 보기  \ncmd 관리 권한  \ncmd ipconfig  \ncmd 명령어  \ncmd 정품인증",
-      "ocrErrorLine": "명령 프롬프트",
+      "title": "PowerShell 스크립트 실행 오류 (PSSecurityException)",
+      "body": "![이미지](/uploads/1765329620534-7d83e802112342a6.png)",
+      "ocrText": "npm : 이 시스템에서 스크립트를 실행할 수 없습니다. C:\\Program Files\\nodejs\\npm.ps1 파일을 로드할 수 없습니다. 자세한 내용은 about_Execution_Policies(https://go.microsoft.com/fwlink/?LinkID=135170)를 참조하십시오.\n위치 줄:1 문자:1\n+ CategoryInfo          : 보안 오류: (:) [], PSSecurityException\n+ FullyQualifiedErrorId : UnauthorizedAccess",
+      "ocrErrorLine": "npm : 이 시스템에서 스크립트를 실행할 수 없습니다. C:\\Program Files\\nodejs\\npm.ps1 파일을 로드할 수 없습니다. 자세한 내용은 about_Execution_Policies(https://go.microsoft.com/fwlink/?LinkID=135170)를 참조하십시오.",
       "tags": [
-        "Terminal"
+        "Windows",
+        "PowerShell",
+        "npm",
+        "Node.js"
       ],
       "keywords": [
-        "명령",
-        "한번",
-        "윈도우",
-        "여나요",
-        "캡쳐대",
-        "프롬프트",
-        "캡쳐대로",
-        "윈도우에서",
-        "명령 프롬프트",
-        "캡쳐대로 한번",
-        "윈도우에서 명령",
-        "여나요 캡쳐대로",
-        "한번 따라해보실래요"
+        "Terminal",
+        "터미널",
+        "PowerShell",
+        "스크립트",
+        "실행",
+        "npm",
+        "보안",
+        "오류",
+        "ExecutionPolicy",
+        "PSSecurityException"
       ],
-      "answer": "![이미지](/uploads/1765298502918-c5c61d89e3bdb192.png)\n\n캡쳐대로 한번 따라해보실래요? \ncmd 명령어를 통해 열 수 있습니다! Windows 키 + R을 누른 후 실행 창에 cmd를 입력해보세요!\n안되시면 말씀해주세요.",
-      "author": "베니",
-      "timestamp": "2025-12-09T16:42:31.714Z",
-      "views": 0
+      "answer": "저 내용은 Window 보안설정 문제에요! \n\n1번부터 순서대로 해보실래요?\n\n1.  PowerShell을 관리자 권한으로 열기\n`시작 버튼 → PowerShell 검색 → Windows PowerShell 우클릭 → 관리자 권한으로 실행`\n\n2. 아래 명령어를 입력하세요!\n`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`\n\n3. 해당 명령어를 쳐서 아무것도 출력이 안될 수도 있고, 아래와 같은 선택지가 나올 수도 있는데요.\n`[Y] 예(Y)  [A] 모두 예(A)  [N] 아니요(N)  [L] 모두 아니요(L)  [S] 일시 중단(S)  [?] 도움말 (기본값은 \\\"N\\\"임):`\n여기서 A를 눌러주시면 됩니다! \n\n이제 그 창에서 그대로 아래 설치를 재시도 해보세요. 해보시고 말씀 해주실래요?",
+      "author": "지지",
+      "timestamp": "2025-12-10T01:22:40.918Z",
+      "views": 0,
+      "imageUrl": "/uploads/1765329620534-7d83e802112342a6.png"
+    },
+    {
+      "id": "qna-007",
+      "category": "Terminal",
+      "title": "[이미지 포함]",
+      "body": "![이미지](/uploads/1765329620534-7d83e802112342a6.png)",
+      "ocrText": null,
+      "ocrErrorLine": null,
+      "tags": [
+        "Windows",
+        "PowerShell"
+      ],
+      "keywords": [
+        "Terminal",
+        "터미널",
+        "내용",
+        "권한",
+        "열기",
+        "순서대",
+        "관리자",
+        "보안설정",
+        "문제에요",
+        "window",
+        "내용은 window",
+        "검색 windows",
+        "window 보안설정",
+        "버튼 powershell",
+        "powershell 검색"
+      ],
+      "answer": "저 내용은 Window 보안설정 문제에요! 1번부터 순서대로 해보실래요?\\n\\n1. PowerShell을 관리자 권한으로 열기\\n\\t시작 버튼 → PowerShell 검색 → Windows PowerShell 우클릭 → 관리자 권한으로 실행\\n2. 아래 명령어를 입력하세요!\\n\\t`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`\\n3. 해당 명령어를 쳐서 아무것도 출력이 안될 수도 있고, 아래와 같은 선택지가 나올 수도 있는데요.\\n\\t`[Y] 예(Y) [A] 모두 예(A) [N] 아니요(N) [L] 모두 아니요(L) [S] 일시 중단(S) [?] 도움말 (기본값은 \\\"N\\\"임):`\\n여기서 A를 눌러주시면 됩니다! \\n\\n이제 그 창에서 그대로 아래 설치를 재시도 해보세요. 해보시고 말씀 해주실래요?",
+      "author": "로지",
+      "timestamp": "2025-12-10T01:40:19.865Z",
+      "views": 0,
+      "imageUrl": null
+    },
+    {
+      "id": "qna-008",
+      "category": "Front-end",
+      "title": "PSSecurityException",
+      "body": "![이미지](/uploads/1765331555237-0d3eb05080134788.png)",
+      "ocrText": "npm : 이 시스템에서 스크립트를 실행할 수 없으므로 C:\\Program Files\\nodejs\\npm.ps1 파일을 로드할 수 없습니다. 자세한 내용은 about_Execution_Policies(https://go.microsoft.com/fwlink/?LinkID=135170)를 참조하십시오.\n위치 줄:1 문자:1\n+ CategoryInfo          : 보안 오류: (:) [], PSSecurityException\n+ FullyQualifiedErrorId : UnauthorizedAccess\n```",
+      "ocrErrorLine": "npm : 이 시스템에서 스크립트를 실행할 수 없으므로 C:\\Program Files\\nodejs\\npm.ps1 파일을 로드할 수 없습니다. 자세한 내용은 about_Execution_Policies(https://go.microsoft.com/fwlink/?LinkID=135170)를 참조하십시오.",
+      "tags": [
+        "Windows",
+        "PowerShell",
+        "npm",
+        "Node.js"
+      ],
+      "keywords": [
+        "Frontend",
+        "Front-end",
+        "npm",
+        "내용",
+        "권한",
+        "열기",
+        "순서대",
+        "관리자",
+        "보안설정",
+        "문제에요",
+        "window",
+        "내용은 window",
+        "검색 windows",
+        "window 보안설정",
+        "버튼 powershell",
+        "powershell 검색"
+      ],
+      "answer": "저 내용은 Window 보안설정 문제에요! 1번부터 순서대로 해보실래요?\\\\\\\\n\\\\\\\\n1. PowerShell을 관리자 권한으로 열기\\\\\\\\n\\\\\\\\t시작 버튼 → PowerShell 검색 → Windows PowerShell 우클릭 → 관리자 권한으로 실행\\\\\\\\n2. 아래 명령어를 입력하세요!\\\\\\\\n\\\\\\\\t`Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`\\\\\\\\n3. 해당 명령어를 쳐서 아무것도 출력이 안될 수도 있고, 아래와 같은 선택지가 나올 수도 있는데요.\\\\\\\\n\\\\\\\\t`[Y] 예(Y) [A] 모두 예(A) [N] 아니요(N) [L] 모두 아니요(L) [S] 일시 중단(S) [?] 도움말 (기본값은 \\\\\\\\\\\\\\\"N\\\\\\\\\\\\\\\"임):`\\\\\\\\n여기서 A를 눌러주시면 됩니다! \\\\\\\\n\\\\\\\\n이제 그 창에서 그대로 아래 설치를 재시도 해보세요. 해보시고 말씀 해주실래요?",
+      "author": "지지",
+      "timestamp": "2025-12-10T01:53:05.921Z",
+      "views": 0,
+      "imageUrl": "/uploads/1765331555237-0d3eb05080134788.png"
+    },
+    {
+      "id": "qna-009",
+      "category": "Figma",
+      "title": "텍스트를 드래그 후  Text에서 h3를 선택하면 글씨가 h3 사이즈로 바뀌는 거 아닌가요? 자꾸 설정화면이 나오는 거 같아요",
+      "body": "텍스트를 드래그 후  Text에서 h3를 선택하면 글씨가 h3 사이즈로 바뀌는 거 아닌가요? 자꾸 설정화면이 나오는 거 같아요\n![이미지](/uploads/1765333588140-3f26ba79f605ff98.png)",
+      "ocrText": "Missing font  \nReplacement  \nPretendard  \n→  \nSelect font  \nClose  \nGet Figma’s font installer or desktop app to use fonts from your computer.\n\nMissing font  \nReplacement  \nPretendard  \nPretendard Variable  \nClose",
+      "ocrErrorLine": "Missing font",
+      "tags": [
+        "Figma"
+      ],
+      "keywords": [
+        "Figma",
+        "글씨",
+        "바뀌",
+        "자꾸",
+        "텍스트",
+        "드래그",
+        "사이즈",
+        "선택하면",
+        "아닌가요",
+        "missing font",
+        "찾아봐주세요 missing",
+        "받았다면 replacement",
+        "font replacement",
+        "pretaendard variable를"
+      ],
+      "answer": "폰트가 없어서 나오는 화면입니다! 이전에 다운을 받았다면 Replacement 에서 Pretaendard Variable를 한번 찾아봐주세요!\n![이미지](/uploads/1765333599072-7f1a1c26258ec774.png)",
+      "author": "오나",
+      "timestamp": "2025-12-10T02:26:41.503Z",
+      "views": 0,
+      "imageUrl": "/uploads/1765333588140-3f26ba79f605ff98.png"
     }
   ]
 }

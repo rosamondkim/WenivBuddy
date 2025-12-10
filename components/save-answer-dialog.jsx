@@ -21,21 +21,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Save } from "lucide-react"
-
-const CATEGORIES = [
-  { value: "Frontend", label: "Frontend" },
-  { value: "Backend", label: "Backend" },
-  { value: "CSS", label: "CSS" },
-  { value: "JavaScript", label: "JavaScript" },
-  { value: "Git", label: "Git" },
-  { value: "도구", label: "도구" }
-]
+import { CATEGORIES } from "@/lib/constants"
 
 export function SaveAnswerDialog({ open, onOpenChange, question, ocrText = null, answer, initialKeywords = [], initialCategory = "all" }) {
   const [isSaving, setIsSaving] = useState(false)
   const [editedQuestion, setEditedQuestion] = useState(question)
   const [editedAnswer, setEditedAnswer] = useState(answer)
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory === "all" ? "Frontend" : initialCategory)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory === "all" ? "Front-end" : initialCategory)
   const [author, setAuthor] = useState("")
   const [keywordsInput, setKeywordsInput] = useState(initialKeywords.join(", "))
   const [error, setError] = useState(null)

@@ -14,7 +14,6 @@ import {
   Clock,
   Loader2,
 } from "lucide-react";
-import { extractKeywords } from "@/lib/keyword-extractor";
 
 export function PreviousAnswers({
   searchQuery,
@@ -125,6 +124,9 @@ export function PreviousAnswers({
         return;
       }
 
+      console.log(`🔍 [Search] Calling API with query length: ${finalQuery.length}, isOCR: ${uploadedImage !== null}`);
+      console.log(`📝 [Search] Query preview: ${finalQuery.substring(0, 100)}...`);
+
       // 서버 사이드 검색 API 호출
       try {
         const response = await fetch("/api/qna/search", {
@@ -141,11 +143,18 @@ export function PreviousAnswers({
           cache: "no-store",
         });
 
+        console.log(`📡 [Search] API response status: ${response.status}`);
+
         if (!response.ok) {
           throw new Error(`Search failed: ${response.status}`);
         }
 
         const searchResult = await response.json();
+
+        console.log(`✅ [Search] Got ${searchResult.results?.length || 0} results`);
+        if (searchResult.results && searchResult.results.length > 0) {
+          console.log(`📋 [Search] Top result: ${searchResult.results[0].id} (score: ${searchResult.results[0].score?.toFixed(3)})`);
+        }
 
         // 추출 정보 저장
         if (searchResult.extractionInfo) {
@@ -158,26 +167,6 @@ export function PreviousAnswers({
           }
 
           // 추가 정보를 상태로 저장 (신뢰도 표시용)
-          setSearchResults(searchResult.results || []);
-        } else {
-          setSearchResults(searchResult.results || []);
-          setExtractionInfo(null);
-
-          if (onExtractionInfoChange) {
-            onExtractionInfoChange(null);
-          }
-        }
-
-        // 추출 정보 저장
-        if (searchResult.extractionInfo) {
-          setExtractedKeywords(searchResult.extractionInfo.keywords || []);
-          setExtractionInfo(searchResult.extractionInfo);
-
-          // 부모 컴포넌트에 추출 정보 전달
-          if (onExtractionInfoChange) {
-            onExtractionInfoChange(searchResult.extractionInfo);
-          }
-
           setSearchResults(searchResult.results || []);
         } else {
           setSearchResults(searchResult.results || []);
@@ -429,6 +418,20 @@ export function PreviousAnswers({
                       </div>
                     )}
 
+                    {/* 질문 이미지 */}
+                    {answer.imageUrl && (
+                      <div className="overflow-hidden rounded-md border border-border">
+                        <img
+                          src={answer.imageUrl}
+                          alt="질문 이미지"
+                          className="h-auto w-full max-w-md mx-auto"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      </div>
+                    )}
+
                     {/* OCR 텍스트 토글 */}
                     {answer.ocrText && (
                       <div className="rounded-lg border border-border">
@@ -476,6 +479,7 @@ export function PreviousAnswers({
                                 </p>
                               );
                             } else if (part.type === "image") {
+                              // 답변 본문에 이미지가 이미 표시되므로 하단에 중복 표시하지 않음
                               return (
                                 <div
                                   key={idx}
@@ -497,20 +501,6 @@ export function PreviousAnswers({
                         )}
                       </div>
                     </div>
-
-                    {/* 이미지 (있는 경우) */}
-                    {answer.imageUrl && (
-                      <div className="overflow-hidden rounded-md border border-border">
-                        <img
-                          src={answer.imageUrl}
-                          alt="답변 스크린샷"
-                          className="h-auto w-1/2 mx-auto"
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      </div>
-                    )}
 
                     {/* 메타 정보 */}
                     <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">

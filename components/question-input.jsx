@@ -50,13 +50,6 @@ export function QuestionInput({ onSearch }) {
     // 텍스트나 이미지 중 하나는 있어야 함
     if (!question.trim() && !uploadedImage) return;
 
-    // 카테고리는 "all"로 고정 (LLM이 자동으로 추정)
-    console.log("[v0] Submitting question:", {
-      question,
-      category: "all",
-      hasImage: !!uploadedImage,
-    });
-
     // 텍스트와 이미지를 함께 전달
     onSearch(question, "all", uploadedImage);
   };

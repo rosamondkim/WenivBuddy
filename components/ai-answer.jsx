@@ -30,7 +30,6 @@ export function AiAnswer({ searchQuery, selectedCategory = "all", extractionInfo
 
     try {
       console.log('🤖 [AI Answer] Calling API...')
-      console.log('📝 [AI Answer] Full question:', fullQuestion.substring(0, 200) + '...')
 
       const response = await fetch('/api/generate-answer', {
         method: 'POST',
